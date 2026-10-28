@@ -51,3 +51,45 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.channel-form {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-width: calc(100vw - 32px);
+  font: 14px system-ui, sans-serif;
+  color: #ddd;
+}
+
+.channel-form input {
+  width: 280px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid #444;
+  background: #111;
+  color: #eee;
+}
+
+.channel-form button {
+  padding: 6px 12px;
+  border: 1px solid #444;
+  background: #222;
+  color: #eee;
+  cursor: pointer;
+}
+
+.controls-hint {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 1;
+  margin: 0;
+  font: 13px system-ui, sans-serif;
+  color: #aaa;
+  pointer-events: none;
+}

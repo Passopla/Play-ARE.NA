@@ -33,8 +33,8 @@ function overlaps(pos, half, b) {
 }
 
 // Moves a box-shaped body one axis at a time, pushing it out of anything it ends up inside.
-// Mutates pos and vel; returns the surfaces touched as [axis, sign] normals,
-// e.g. ['y', 1] = standing on top of something, ['x', -1] = hit a wall while moving +x.
+// Mutates pos and vel; returns the surfaces touched as [axis, sign, box]: the normal and the box,
+// e.g. ['y', 1, box] = standing on top of box, ['x', -1, box] = hit box's side while moving +x.
 // ponytail: axis-aligned boxes only, which is all the layout makes. Swap for @react-three/rapier
 // when you need slopes or rotated geometry.
 export function moveAndCollide(pos, vel, half, boxes, dt) {
@@ -51,16 +51,11 @@ export function moveAndCollide(pos, vel, half, boxes, dt) {
         if (!overlaps(pos, half, b)) continue;
         pos[a] = d > 0 ? b.min[a] - half[a] : b.max[a] + half[a];
         vel[a] = 0;
-        contacts.push([a, d > 0 ? -1 : 1]);
+        contacts.push([a, d > 0 ? -1 : 1, b]);
       }
     }
   }
   return contacts;
-}
-
-// Collision box of a body standing on a surface whose normal lies along upAxis
-export function halfExtents(upAxis, radius, halfHeight) {
-  return { x: radius, y: radius, z: radius, [upAxis]: halfHeight };
 }
 
 // Top of the flat (floor-like) collider nearest to a point, or null if none are loaded

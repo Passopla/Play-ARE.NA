@@ -14,7 +14,8 @@
 
 # misc
 .DS_Store
-.env.local
+.env*.local
+.env
 .env.development.local
 .env.test.local
 .env.production.local
@@ -22,3 +23,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Character source files the game doesn't load (kept locally, not published)
+public/Characters/**/*_AO.png
+public/Characters/WOMAN_00/
+public/anims/Climbing Up Wall.fbx

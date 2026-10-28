@@ -1,6 +1,6 @@
 // Run with: npm run check
 import assert from 'node:assert/strict';
-import { moveAndCollide, halfExtents } from './physics.js';
+import { moveAndCollide } from './physics.js';
 
 const half = { x: 0.3, y: 0.8, z: 0.3 };
 const box = (min, max) => ({
@@ -34,16 +34,7 @@ vel = { x: 6, y: -0.5, z: 0 };
 contacts = moveAndCollide(pos, vel, half, [floor, wall], 1);
 assert.equal(pos.x, 1 - half.x);
 assert.ok(touched(contacts, 'x', -1));
-
-// Stuck to the wall (gravity pulling +x into it), the body rests against it
-const onWall = halfExtents('x', 0.3, 0.8);
-pos = { x: 0, y: 1.5, z: 0 };
-vel = { x: 0, y: 0, z: 0 };
-for (let i = 0; i < 60; i++) {
-  vel.x += 25 / 60;
-  contacts = moveAndCollide(pos, vel, onWall, [wall], 1 / 60);
-}
-assert.equal(pos.x, 1 - onWall.x);
-assert.ok(touched(contacts, 'x', -1));
+// ...and says which box it was, so the climber knows where the wall's top edge is
+assert.equal(contacts.find(([a]) => a === 'x')[2], wall);
 
 console.log('physics checks passed');

@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/arena/:path*", "destination": "/api/arena?path=:path*" }]
+}

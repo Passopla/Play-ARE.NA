@@ -1,6 +1,6 @@
 // Run with: npm run check
 import assert from 'node:assert/strict';
-import { roomLayout, roomWalls, spiralCells, roomsNear, FLOOR_SLOTS, ROOM_SPACING } from './layout.js';
+import { roomLayout, roomWalls, spiralCells, roomsNear, fillNearest, FLOOR_SLOTS, ROOM_SPACING } from './layout.js';
 import { arenaSlug } from './arena.js';
 
 // Every image is placed exactly once, in order
@@ -37,6 +37,18 @@ assert.ok([...start].every((r) => moved.has(r)));
 assert.equal(moved.size, 12);
 // Moving far away drops the origin rooms
 assert.ok(!roomsNear(many, [ROOM_SPACING * 4, 0], moved).has(0));
+
+// Fetched images land in the nearest empty room, floors first, then spill into the next nearest
+const sparse = Array(200).fill(null);
+const far = rooms[10];
+const near = (r) => [r.cell[0] * ROOM_SPACING, r.cell[1] * ROOM_SPACING];
+const filled = fillNearest(sparse, rooms, near(far), Array.from({ length: far.items.length + 2 }, (_, i) => i + 1));
+assert.deepEqual(far.items.map(({ index }) => filled[index]), far.items.map((_, i) => i + 1));
+assert.equal(filled.filter(Boolean).length, far.items.length + 2);
+assert.equal(sparse.filter(Boolean).length, 0); // input untouched
+// Already-filled slots are skipped
+const again = fillNearest(filled, rooms, near(far), ['x']);
+assert.ok(far.items.every(({ index }) => again[index] === filled[index]));
 
 assert.equal(arenaSlug('https://www.are.na/someone/my-channel?page=2'), 'my-channel');
 assert.equal(arenaSlug('https://www.are.na/someone/my-channel/'), 'my-channel');

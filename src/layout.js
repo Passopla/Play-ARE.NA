@@ -75,3 +75,20 @@ export function roomsNear(cells, [x, z], prev = new Set(), loadRings = 1, unload
   });
   return next;
 }
+
+// Puts newly fetched images into the empty slots of the rooms nearest (x, z), filling each room
+// (floors first) before the next, so loading follows wherever the viewer is heading.
+// images is sparse: null where nothing has been fetched yet. Returns a new array.
+export function fillNearest(images, rooms, [x, z], batch) {
+  const next = images.slice();
+  const distance = ({ cell: [cx, cz] }) => Math.hypot(cx * ROOM_SPACING - x, cz * ROOM_SPACING - z);
+  const order = [...rooms].sort((a, b) => distance(a) - distance(b));
+  let i = 0;
+  for (const room of order) {
+    for (const { index } of room.items) {
+      if (i === batch.length) return next;
+      if (!next[index]) next[index] = batch[i++];
+    }
+  }
+  return next;
+}

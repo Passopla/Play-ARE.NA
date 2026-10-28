@@ -1,64 +1,82 @@
-# 3D Image Layout with Three.js
+# Floating Linked Images 3D: The Game
 
-This project is a basic template designed to help people get started with Three.js. It showcases a 3D layout of images using React and Three.js, allowing for interactive exploration of images placed in a 3D space.
+The game side of [Floating Linked Images 3D](https://github.com/Passopla/Floating-Linked-Images-3D). Paste any public [are.na](https://www.are.na) channel and it becomes a world of floating billboards. Then press **V** and explore it as a miniature character: run across the images, jump the gaps, climb the walls and pull yourself up onto their edges.
 
-screenCap: ![SCREENCAP](https://d2w9rnfcy7mm78.cloudfront.net/35042926/original_cb32293a4381e0f365057a1c92d0812c.gif?1741307461)
-
-## Features
-
-- Displays images in a 3D environment using Three.js
-- Interactive controls to explore the scene
-- Supports both static images and animated GIFs
-- Simple and precise coordinate systems for positioning
-
-## Dependencies
-
-This project uses the following libraries:
-
-- [React](https://reactjs.org/): A JavaScript library for building user interfaces
-- [Three.js](https://threejs.org/): A 3D library that makes WebGL simpler
-- [@react-three/fiber](https://github.com/pmndrs/react-three-fiber): A React renderer for Three.js
-- [@react-three/drei](https://github.com/pmndrs/drei): Useful helpers for react-three-fiber
+> Looking for the original 3D image layout, the version on the Studio side of [amanziconnexions.com](https://amanziconnexions.com)? That lives on the [`master`](https://github.com/Passopla/Floating-Linked-Images-3D/tree/master) branch. This `game` branch is where the game is being built.
 
 Inspired by this GIF: ![Inspiration GIF](https://d2w9rnfcy7mm78.cloudfront.net/25331503/original_8fd108a2dc340a19c9238bf5dac151f2.gif?1703160360)
 
-## Installation
+## What's in it
 
-1. Clone the repository:
+- **Any are.na channel:** paste a link, or drag one onto the page. Each room keeps the original nine-image layout. It always has floors, and a random mix of walls.
+- **Channels of any size:** images stream in 25 at a time, filling the rooms nearest you first. A 3,000-image channel never loads all at once.
+- **Sharp up close, light far away:** each image shows a small version at a distance and swaps in the full-size version as you get near. Rooms you leave are unloaded.
+- **Two characters, Samu and Bongz**, animated with Mixamo:
+  - run, jump and double jump
+  - climb any wall, pull up onto its top edge, or leap off it
+  - hard landings after big falls
+  - idle animations, plus talking or dancing when left standing a while
+- **Close third-person camera** over the shoulder. Click to capture the mouse, and the camera pulls in instead of ending up behind an image.
+- **Light and dark mode** with an animated sun and moon toggle.
+
+## Controls
+
+| | Explore mode | Game mode (press **V**) |
+|---|---|---|
+| Move | WASD / arrows (Shift = faster) | WASD / arrows to run (Shift = sprint) |
+| Look | Left-drag to orbit | Click to capture the mouse, then move it (Esc frees it) |
+| Pan | Right-drag (two-finger click-drag on a trackpad) | |
+| Zoom | Scroll | Scroll |
+| Jump | | Space, and Space again in mid-air for a double jump |
+| Climb | | Run or jump into a wall, then W/S to climb and A/D to shuffle. Space leaps off |
+
+## Getting started
+
+1. Clone the repository and switch to this branch:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Passopla/Floating-Linked-Images-3D.git
+   cd Floating-Linked-Images-3D
+   git checkout game
    ```
-2. Navigate to the project directory:
-   ```bash
-   cd 3d-image-layout
-   ```
-3. Install the dependencies:
+2. Install the dependencies:
    ```bash
    npm install
    ```
+3. Optional: add your [are.na API token](https://dev.are.na) in a file called `.env.local` in the project folder. Public channels work without one.
+   ```
+   ARENA_TOKEN=your-token-here
+   ```
+   The token stays on the server: the dev server and the Vercel function add it to are.na requests, so it never reaches the browser. `.env.local` is git-ignored.
 4. Start the development server:
    ```bash
-   npm start
+   npm run dev
+   ```
+5. Optional: run the layout and physics checks:
+   ```bash
+   npm run check
    ```
 
-## Image Credits
+## Deploying on Vercel
 
-The images used in this project were sourced from [are.na](https://www.are.na):
+1. Import the repository. Vite is detected on its own.
+2. If this project's production deployment should be the game, set **Settings → Git → Production Branch** to `game`.
+3. Add `ARENA_TOKEN` under **Settings → Environment Variables**. Don't use a `VITE_` prefix, because those variables are built into the browser code.
 
-![Image 1](https://d2w9rnfcy7mm78.cloudfront.net/3894388/original_1e9e4ee58447dd9add36c08b6e4b2dd2.gif?1553011688)
-![Image 2](https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIyNTMzMTU2MC9vcmlnaW5hbF8yOWEyNGJlNGYzMTBiM2JmZTEyNjE3MGU1OGUzNmRlZi5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=)
-![Image 3](https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI3NzE0NDE5L29yaWdpbmFsX2JiMTNhNmEwOThlMWI0ZGQyMDIwMDYxOC00LTFkMnpyaDQuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjozMDAsImhlaWdodCI6MzAwLCJmaXQiOiJpbnNpZGUiLCJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWV9LCJ3ZWJwIjp7InF1YWxpdHkiOjc1fSwiZmxhdHRlbiI6eyJiYWNrZ3JvdW5kIjp7InIiOjIwMywiZyI6MjAzLCJiIjoyMDN9fSwianBlZyI6eyJxdWFsaXR5Ijo3NX0sInJvdGF0ZSI6bnVsbH19)
-![Image 4](https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNTAzNTIxOS9vcmlnaW5hbF9jYzI5ZTAxMDE1MWVmNzZkMDI2N2JkODRlNGNiZDZiOC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=)
-![Image 5](https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNTAyMzY5MC9vcmlnaW5hbF9hZTBjNmE1NjU1MWYzMWI0YTI2MjcwMzJiY2ViYzBiOC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=)
-![Image 6](https://d2w9rnfcy7mm78.cloudfront.net/34702321/original_065555d22addd36aa9eecbd9d621c5a7.gif?1740113172)
-![Image 7](https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNDcwMjI5Mi9vcmlnaW5hbF8zNjU0ZjA5NzZhNTFhZjhiODNhMzQ5NTgwMjJlMjdkMi5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=)
-![Image 8](https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNDcwMjE3Ni9vcmlnaW5hbF9mOGJhYWYwYTZlMDI3NWI5YjFiNzM0MTJjYWMxYTcwOS5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=)
-![Image 9](https://d2w9rnfcy7mm78.cloudfront.net/34702184/original_dc6fcb41eecc6bf457e7e388f47aac3f.gif?1740112610)
+`vercel.json` routes `/arena/*` to `api/arena.js`, which forwards only the two are.na requests the app makes, with the token added.
+
+## Tuning the game feel
+
+Every movement setting is a named constant at the top of the game section in `src/App.jsx`: run speed, jump height, double-jump burst, climb speed, camera distance and mouse sensitivity, among others. Animation clips and the idle timer are in `src/character.jsx`.
+
+## Built with
+
+- [React](https://reactjs.org/) and [Vite](https://vite.dev/)
+- [Three.js](https://threejs.org/), with [@react-three/fiber](https://github.com/pmndrs/react-three-fiber) and [@react-three/drei](https://github.com/pmndrs/drei)
 
 ## Credits
 
-Designed by Karl Ndebele using Cursor. Images were sourced from [are.na](https://www.are.na).
+Designed by Karl Ndebele. Images come from [are.na](https://www.are.na) channels, character animations from [Mixamo](https://www.mixamo.com), and the character models from [itch.io](https://itch.io).
 
 ## License
 
-This project is open-source and available under the [MIT License](LICENSE).
+The code is open-source under the [MIT License](LICENSE). The character models and animations are third-party assets covered by their own licences.

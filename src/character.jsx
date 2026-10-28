@@ -6,8 +6,8 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 // Playable characters, first is the default. All share one rig, so every clip below fits each.
 // height = model units (cm) from feet to top of head, used to scale it to the game's size.
 export const CHARACTERS = {
-  WOMAN_01: { label: 'Samu', model: '/Characters/WOMAN_01/WOMAN_01/WOMAN_00_Model.fbx', texture: '/Characters/WOMAN_01/WOMAN_01/WOMAN_00_Texture.png', height: 197 },
-  MAN_00: { label: 'Bongz', model: '/Characters/MAN_00/MAN_00/MAN_00_Model.fbx', texture: '/Characters/MAN_00/MAN_00/MAN_00_Texture.png', height: 197 },
+  WOMAN_01: { label: 'Samu', model: import.meta.env.BASE_URL + 'Characters/WOMAN_01/WOMAN_01/WOMAN_00_Model.fbx', texture: import.meta.env.BASE_URL + 'Characters/WOMAN_01/WOMAN_01/WOMAN_00_Texture.png', height: 197 },
+  MAN_00: { label: 'Bongz', model: import.meta.env.BASE_URL + 'Characters/MAN_00/MAN_00/MAN_00_Model.fbx', texture: import.meta.env.BASE_URL + 'Characters/MAN_00/MAN_00/MAN_00_Texture.png', height: 197 },
 };
 const ROOT_TRACK = 'metarig.position'; // Mixamo put the body's travel on the rig root
 const FADE = 0.15; // seconds to blend between clips
@@ -66,7 +66,7 @@ const rootStart = (clip) => [...clip.tracks.find((t) => t.name === ROOT_TRACK).v
 export function Character({ who, pose, pace, height }) {
   const look = CHARACTERS[who];
   const names = Object.keys(CLIPS);
-  const [model, ...files] = useLoader(FBXLoader, [look.model, ...names.map((n) => encodeURI(`/anims/${CLIPS[n].file}.fbx`))]);
+  const [model, ...files] = useLoader(FBXLoader, [look.model, ...names.map((n) => encodeURI(`${import.meta.env.BASE_URL}anims/${CLIPS[n].file}.fbx`))]);
   const texture = useLoader(TextureLoader, look.texture);
 
   const { mixer, actions } = useMemo(() => {

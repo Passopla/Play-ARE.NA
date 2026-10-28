@@ -28,3 +28,4 @@ yarn-error.log*
 public/Characters/**/*_AO.png
 public/Characters/WOMAN_00/
 public/anims/Climbing Up Wall.fbx
+/pages-dist

@@ -75,8 +75,12 @@ Every movement setting is a named constant at the top of the game section in `sr
 
 ## Credits
 
-Designed by Karl Ndebele. Images come from [are.na](https://www.are.na) channels, character animations from [Mixamo](https://www.mixamo.com), and the character models from [itch.io](https://itch.io).
+Designed by Karl Ndebele.
+
+- **Images:** from [are.na](https://www.are.na) channels
+- **Characters (Samu and Bongz):** from [AI Generated Character Pack 2](https://rotinda-dag.itch.io/ai-generated-character-pack-2) by rotinda dag
+- **Animations:** from [Mixamo](https://www.mixamo.com)
 
 ## License
 
-The code is open-source under the [MIT License](LICENSE). The character models and animations are third-party assets covered by their own licences.
+The code is open-source under the [MIT License](LICENSE). The MIT License doesn't cover the character models or the animations. They belong to their creators and are used under their own terms: the character pack may be used in personal and commercial projects, but the pack itself may not be redistributed or resold. Please get the characters from [the creator's page](https://rotinda-dag.itch.io/ai-generated-character-pack-2), not from this repository.

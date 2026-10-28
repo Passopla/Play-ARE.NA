@@ -556,6 +556,10 @@ function Scene() {
   return null;
 }
 
+// Background music: "Amahlalakhona (Thando vox)" by Epic Lova. Starts when the menu closes
+// (browsers only allow sound after a click). The control hides itself if the file is missing.
+const MUSIC = `${import.meta.env.BASE_URL}music/amahlalakhona.mp3`;
+
 function App() {
   const [images, setImages] = useState(DEFAULT_IMAGES);
   const [channel, setChannel] = useState(
@@ -578,6 +582,19 @@ function App() {
     } catch {}
   }, [theme]);
   const [gameMode, setGameMode] = useState(false);
+  const [menu, setMenu] = useState(true); // the menu card: open at start (once loading is done) and from the Menu button
+  const [started, setStarted] = useState(false); // left the menu once; music waits for that click
+  const [music, setMusic] = useState(true);
+  const [volume, setVolume] = useState(0.5);
+  const [hasMusic, setHasMusic] = useState(true);
+  const audio = useRef(null);
+
+  useEffect(() => {
+    const a = audio.current;
+    a.volume = volume;
+    if (music && started) a.play().catch(() => {}); // autoplay refusals are fine: the toggle retries
+    else a.pause();
+  }, [music, volume, started]);
   const [who, setWho] = useState(Object.keys(CHARACTERS)[0]);
 
   // V toggles game mode (third-person character) and back to free navigation
@@ -675,6 +692,63 @@ function App() {
         loadChannel(link);
       }}
     >
+      <audio ref={audio} src={MUSIC} loop preload="auto" onError={() => setHasMusic(false)} />
+      {menu && !loading && (
+        <div className="menu-backdrop">
+          <section className="menu" aria-labelledby="menu-title">
+            <p className="menu-kicker">Amanzi Connexions · Game</p>
+            <h1 id="menu-title">Play ARE.NA</h1>
+            <p className="menu-desc">
+              Build your world by pasting a link from a channel on Are.na with images. Navigate the scene using
+              arrow keys/WASD and the mouse. Or jump into Game mode with V to run, jump, and climb across the
+              scene with the images as platforms.
+            </p>
+            <div className="menu-keys">
+              <p>Fly</p>
+              <dl>
+                <dt><kbd>←↑↓→</kbd> <kbd>WASD</kbd></dt><dd>Movement</dd>
+                <dt><kbd>Mouse</kbd></dt><dd>Drag to orbit, right-drag to pan</dd>
+                <dt><kbd>Scroll</kbd></dt><dd>Zoom</dd>
+              </dl>
+              <p>Game</p>
+              <dl>
+                <dt><kbd>←↑↓→</kbd> <kbd>WASD</kbd></dt><dd>Movement</dd>
+                <dt><kbd>Shift</kbd></dt><dd>Sprint</dd>
+                <dt><kbd>Space</kbd></dt><dd>Jump, again in mid-air to double jump</dd>
+                <dt><kbd>Mouse</kbd></dt><dd>Move camera: click to capture, <kbd>Esc</kbd> frees it</dd>
+                <dt><kbd>Wall</kbd></dt><dd>Run into a wall to climb, <kbd>Space</kbd> to leap off</dd>
+                <dt><kbd>C</kbd></dt><dd>Dance and emotes, while standing still</dd>
+                <dt><kbd>Scroll</kbd></dt><dd>Zoom</dd>
+              </dl>
+              <dl>
+                <dt><kbd>V</kbd></dt><dd>Switch Fly / Game</dd>
+              </dl>
+            </div>
+            <div className="menu-actions">
+              <button type="button" onClick={(e) => { e.currentTarget.blur(); setMenu(false); setStarted(true); }}>
+                Explore
+              </button>
+              <button
+                type="button"
+                className="primary"
+                onClick={(e) => { e.currentTarget.blur(); setMenu(false); setStarted(true); setGameMode(true); }}
+              >
+                Play
+              </button>
+            </div>
+            <footer className="menu-credits">
+              <p>Credits</p>
+              <ul>
+                <li>Designed by Karl Ndebele</li>
+                <li>Music: Amahlalakhona (Thando vox) by Epic Lova</li>
+                <li>Characters: AI Generated Character Pack 2 by rotinda dag</li>
+                <li>Animations: Mixamo</li>
+                <li>Images: Are.na</li>
+              </ul>
+            </footer>
+          </section>
+        </div>
+      )}
       {loading && (
         <div className="loading" role="status">
           <span className="loading-ring" aria-hidden="true" />
@@ -691,24 +765,32 @@ function App() {
           if (channel.trim()) loadChannel(channel);
         }}
       >
-        <button
-          type="button"
-          className="theme-toggle"
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-        >
-          {/* Sun in light mode; in dark mode a shadow slides over it into a crescent moon */}
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <mask id="moon-shadow">
-              <rect width="24" height="24" fill="white" />
-              <circle className="moon-shadow" cx="25" cy="-1" r="6" fill="black" />
-            </mask>
-            <circle className="sun" cx="12" cy="12" r="5" fill="currentColor" mask="url(#moon-shadow)" />
-            <g className="rays" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M12 1.5v2M12 20.5v2M1.5 12h2M20.5 12h2M4.6 4.6 6 6M18 18l1.4 1.4M4.6 19.4 6 18M18 6l1.4-1.4" />
-            </g>
-          </svg>
-        </button>
+        {hasMusic && (
+          <span className="music">
+            <button
+              type="button"
+              className="music-toggle"
+              aria-pressed={music}
+              aria-label={music ? 'Turn music off' : 'Turn music on'}
+              onClick={(e) => { e.currentTarget.blur(); setMusic((on) => !on); }}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" />
+                {music ? <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" /> : <path d="m17 9 5 6m0-6-5 6" />}
+              </svg>
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={volume}
+              aria-label="Music volume"
+              onChange={(e) => { setVolume(+e.target.value); setMusic(true); }}
+              onPointerUp={(e) => e.currentTarget.blur()} // otherwise the arrow keys keep changing it
+            />
+          </span>
+        )}
         <select
           aria-label="Character"
           value={who}
@@ -734,11 +816,34 @@ function App() {
           <span role="status">{status || `${shown} of ${images.length} loaded`}</span>
         )}
       </form>
-      <p className="controls-hint">
-        {gameMode
-          ? 'Game · click to capture the mouse (Esc frees it) · WASD run · Shift sprint · Space jump (again in mid-air to double jump) · run into a wall to climb, Space to leap off · scroll zoom · V to exit'
-          : 'WASD move · drag orbit · right-drag pan · scroll zoom · V to play'}
-      </p>
+      <div className="corner">
+        <button
+          type="button"
+          className="theme-toggle"
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+        >
+          {/* Sun in light mode; in dark mode a shadow slides over it into a crescent moon */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <mask id="moon-shadow">
+              <rect width="24" height="24" fill="white" />
+              <circle className="moon-shadow" cx="25" cy="-1" r="6" fill="black" />
+            </mask>
+            <circle className="sun" cx="12" cy="12" r="5" fill="currentColor" mask="url(#moon-shadow)" />
+            <g className="rays" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M12 1.5v2M12 20.5v2M1.5 12h2M20.5 12h2M4.6 4.6 6 6M18 18l1.4 1.4M4.6 19.4 6 18M18 6l1.4-1.4" />
+            </g>
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="menu-button"
+          aria-expanded={menu}
+          onClick={(e) => { e.currentTarget.blur(); setMenu((open) => !open); }}
+        >
+          Menu
+        </button>
+      </div>
       <Canvas
         camera={{ position: [8, 8, 8], fov: 60 }}
         style={{ width: '100vw', height: '100vh' }}

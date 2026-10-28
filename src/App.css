@@ -7,6 +7,14 @@
   --toggle-bg: #ffffff;
   --toggle-fg: #121212;
   --ease: 300ms ease;
+  /* Game panel shading (start menu) */
+  --panel-top: #2b2b2b;
+  --panel-bottom: #161616;
+  --well: #0d0d0d;
+  --edge: #050505;
+  --shine: rgb(255 255 255 / 0.1);
+  --shade: rgb(0 0 0 / 0.35);
+  --drop: rgb(0 0 0 / 0.55);
   color-scheme: dark;
 }
 
@@ -18,6 +26,13 @@
   --line: #b5b5b5;
   --toggle-bg: #121212;
   --toggle-fg: #ffffff;
+  --panel-top: #ffffff;
+  --panel-bottom: #e9e9e9;
+  --well: #dcdcdc;
+  --edge: #9a9a9a;
+  --shine: rgb(255 255 255 / 0.9);
+  --shade: rgb(0 0 0 / 0.08);
+  --drop: rgb(0 0 0 / 0.18);
   color-scheme: light;
 }
 
@@ -53,7 +68,7 @@ body {
   display: flex;
   gap: 8px;
   align-items: center;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100vw - 32px - 140px); /* stops short of the top-right buttons */
   font: 14px system-ui, sans-serif;
   color: var(--fg);
 }
@@ -78,29 +93,45 @@ body {
   transition: background-color var(--ease), color var(--ease), border-color var(--ease);
 }
 
-.controls-hint {
+/* Top right: theme toggle and the Menu button. Above the menu backdrop so it can close it */
+.corner {
   position: fixed;
-  bottom: 16px;
-  left: 16px;
+  top: 16px;
   right: 16px;
-  z-index: 1;
-  margin: 0;
-  font: 13px system-ui, sans-serif;
-  color: var(--muted);
-  transition: color var(--ease);
-  pointer-events: none;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 /* Round sun/moon button; its colours invert with the theme */
-.channel-form .theme-toggle {
+.theme-toggle {
   flex: none;
   width: 36px;
   height: 36px;
   padding: 7px;
+  border: 1px solid var(--toggle-bg);
   border-radius: 50%;
-  border-color: var(--toggle-bg);
   background: var(--toggle-bg);
   color: var(--toggle-fg);
+  cursor: pointer;
+}
+
+.menu-button {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--toggle-bg);
+  border-radius: 999px;
+  background: var(--toggle-bg);
+  color: var(--toggle-fg);
+  font: 800 13px system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.menu-button:active {
+  transform: scale(0.95);
 }
 
 .theme-toggle:active {
@@ -179,11 +210,256 @@ body {
   }
 }
 
+/* Music: round toggle like the theme one, then a volume slider */
+.channel-form .music {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.channel-form .music-toggle {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.music-toggle svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.channel-form .music input {
+  width: 72px;
+  padding: 0;
+  border: 0;
+  background: none;
+  accent-color: var(--fg);
+}
+
+/* Phones: the channel field needs the room; the toggle stays */
+@media (max-width: 600px) {
+  .channel-form {
+    flex-wrap: wrap;
+  }
+  .channel-form .music input {
+    display: none;
+  }
+  /* the channel field gets its own row */
+  .channel-form input {
+    flex: 1 0 60%;
+    order: 1;
+  }
+  .channel-form button[type='submit'] {
+    order: 1;
+  }
+}
+
+/* Start menu: a chunky game panel centred over the scene. Light comes from above: top edges
+   catch a highlight, bottom edges sit in shade, and everything raised has a solid "thickness"
+   (a hard shadow in --edge) plus a soft drop shadow. */
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  padding: 60px 16px 16px; /* clears the top-right buttons */
+  box-sizing: border-box;
+  background: radial-gradient(circle at 50% 40%, transparent, color-mix(in srgb, var(--bg) 80%, transparent) 70%),
+    color-mix(in srgb, var(--bg) 45%, transparent);
+  overflow-y: auto;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(400px, 100%);
+  margin: auto; /* centred, but scrolls from the top when taller than the screen */
+  box-sizing: border-box;
+  padding: 26px 22px 20px;
+  border: 2px solid var(--edge);
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--panel-top), var(--field) 45%, var(--panel-bottom));
+  color: var(--fg);
+  font: 14px/1.5 system-ui, sans-serif;
+  box-shadow:
+    inset 0 2px 0 var(--shine),
+    inset 0 -4px 0 var(--shade),
+    0 8px 0 var(--edge),
+    0 22px 40px var(--drop);
+  animation: menu-in 420ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+  }
+}
+
+.menu p,
+.menu h1,
+.menu dl,
+.menu ul {
+  margin: 0;
+}
+
+/* Small tag above the title, inverted like the toggles */
+.menu-kicker {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--toggle-bg);
+  color: var(--toggle-fg);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 3px 0 var(--edge);
+}
+
+.menu-credits > p,
+.menu-keys > p {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Extruded title: stacked shadows read as depth */
+.menu h1 {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 0 var(--edge), 0 2px 0 var(--edge), 0 3px 0 var(--edge), 0 6px 10px var(--drop);
+}
+
+.menu-desc {
+  color: var(--muted);
+}
+
+/* Key list sits in a recessed well: a Fly group, a Game group, then the V switch */
+.menu-keys {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  border-radius: 10px;
+  background: var(--well);
+  box-shadow: inset 0 3px 6px var(--drop), inset 0 -1px 0 var(--shine);
+}
+
+.menu-keys > p {
+  color: var(--muted);
+}
+
+.menu-keys dl {
+  display: grid;
+  grid-template-columns: 7.5em 1fr;
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.menu-keys dl + p,
+.menu-keys dl + dl {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.menu-keys dt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.menu-keys dd {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Keycaps: rounded top, darker skirt below */
+.menu kbd {
+  display: inline-block;
+  min-width: 14px;
+  padding: 2px 7px 3px;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--panel-top), var(--panel-bottom));
+  color: var(--fg);
+  font: 700 12px ui-monospace, monospace;
+  text-align: center;
+  box-shadow: inset 0 1px 0 var(--shine), 0 3px 0 var(--edge);
+}
+
+.menu-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-bottom: 6px; /* room for the buttons' thickness */
+}
+
+/* Raised buttons that press down when clicked */
+.menu-actions button {
+  padding: 12px;
+  border: 2px solid var(--edge);
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--panel-top), var(--panel-bottom));
+  color: var(--fg);
+  font: 900 15px system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 0 2px 0 var(--shine), 0 5px 0 var(--edge), 0 10px 14px var(--drop);
+  transition: transform 80ms ease, box-shadow 80ms ease, filter 120ms ease;
+}
+
+.menu-actions button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: inset 0 2px 0 var(--shine), 0 6px 0 var(--edge), 0 12px 16px var(--drop);
+}
+
+.menu-actions button:active {
+  transform: translateY(4px);
+  box-shadow: inset 0 2px 0 var(--shine), 0 1px 0 var(--edge), 0 3px 6px var(--drop);
+}
+
+.menu-actions button:focus-visible {
+  outline: 3px solid var(--fg);
+  outline-offset: 3px;
+}
+
+.menu-actions .primary {
+  background: var(--toggle-bg);
+  color: var(--toggle-fg);
+}
+
+.menu-credits {
+  display: grid;
+  gap: 4px;
+  padding-top: 14px;
+  border-top: 2px dashed var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.menu-credits ul {
+  padding: 0;
+  list-style: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .loading-ring {
     animation-duration: 3s;
   }
   .theme-toggle * {
     transition-duration: 0ms !important;
+  }
+  .menu {
+    animation: none;
   }
 }

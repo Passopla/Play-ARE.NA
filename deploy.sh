@@ -4,8 +4,8 @@
 set -e
 cd "$(dirname "$0")"
 
-# MSYS_NO_PATHCONV: Git Bash would turn the /Floating-Linked-Images-3D/ base into a Windows path
-MSYS_NO_PATHCONV=1 VITE_ARENA_API=https://api.are.na npx vite build --base=/Floating-Linked-Images-3D/ --outDir pages-dist
+# MSYS_NO_PATHCONV: Git Bash would turn the /Play-ARE.NA/ base into a Windows path
+MSYS_NO_PATHCONV=1 VITE_ARENA_API=https://api.are.na npx vite build --base=/Play-ARE.NA/ --outDir pages-dist
 
 PAGES=$(mktemp -d)
 cp -r pages-dist/. "$PAGES"

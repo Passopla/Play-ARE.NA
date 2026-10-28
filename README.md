@@ -1,10 +1,21 @@
-# Floating Linked Images 3D: The Game
+# Play ARE.NA
 
-The game side of [Floating Linked Images 3D](https://github.com/Passopla/Floating-Linked-Images-3D). Paste any public [are.na](https://www.are.na) channel and it becomes a world of floating billboards. Then press **V** and explore it as a miniature character: run across the images, jump the gaps, climb the walls and pull yourself up onto their edges.
+Paste any public [are.na](https://www.are.na) channel and it becomes a world of floating billboards. Then press **V** and explore it as a miniature character: run across the images, jump the gaps, climb the walls and pull yourself up onto their edges.
 
-> Looking for the original 3D image layout, the version on the Studio side of [amanziconnexions.com](https://amanziconnexions.com)? That lives on the [`master`](https://github.com/Passopla/Floating-Linked-Images-3D/tree/master) branch. This `game` branch is where the game is being built.
+**Play it:** [passopla.github.io/Play-ARE.NA](https://passopla.github.io/Play-ARE.NA/) · also on the games page of [amanziconnexions.com](https://www.amanziconnexions.com/games)
+
+![Samu standing in a room of film stills](screenshots/play.png)
+
+> Looking for the original 3D image layout, the version on the Studio side of [amanziconnexions.com](https://amanziconnexions.com)? That lives on the [`master`](https://github.com/Passopla/Play-ARE.NA/tree/master) branch. This `game` branch is where the game is being built.
 
 Inspired by this GIF: ![Inspiration GIF](https://d2w9rnfcy7mm78.cloudfront.net/25331503/original_8fd108a2dc340a19c9238bf5dac151f2.gif?1703160360)
+
+## Screenshots
+
+| | |
+|---|---|
+| ![The menu card: description, controls for Fly and Game mode, credits](screenshots/menu.png) | ![Overhead view of a channel laid out as rooms of floating images](screenshots/play3.png) |
+| ![Samu climbing the face of a giant image](screenshots/play1.png) | ![Samu climbing beside a wall of images](screenshots/play2.png) |
 
 ## What's in it
 
@@ -15,8 +26,10 @@ Inspired by this GIF: ![Inspiration GIF](https://d2w9rnfcy7mm78.cloudfront.net/2
   - run, jump and double jump
   - climb any wall, pull up onto its top edge, or leap off it
   - hard landings after big falls
-  - idle animations, plus talking or dancing when left standing a while
+  - idle animations, plus talking or dancing when left standing a while; press **C** to play them yourself
 - **Close third-person camera** over the shoulder. Click to capture the mouse, and the camera pulls in instead of ending up behind an image.
+- **Menu card** on start (and from the Menu button) with the controls and credits.
+- **Background music** with an on/off button and volume slider.
 - **Light and dark mode** with an animated sun and moon toggle.
 
 ## Controls
@@ -29,13 +42,15 @@ Inspired by this GIF: ![Inspiration GIF](https://d2w9rnfcy7mm78.cloudfront.net/2
 | Zoom | Scroll | Scroll |
 | Jump | | Space, and Space again in mid-air for a double jump |
 | Climb | | Run or jump into a wall, then W/S to climb and A/D to shuffle. Space leaps off |
+| Dance | | C while standing still steps through the dances and emotes |
+| Switch | V to Game mode | V back to Explore |
 
 ## Getting started
 
 1. Clone the repository and switch to this branch:
    ```bash
-   git clone https://github.com/Passopla/Floating-Linked-Images-3D.git
-   cd Floating-Linked-Images-3D
+   git clone https://github.com/Passopla/Play-ARE.NA.git
+   cd Play-ARE.NA
    git checkout game
    ```
 2. Install the dependencies:
@@ -80,6 +95,7 @@ Designed by Karl Ndebele.
 - **Images:** from [are.na](https://www.are.na) channels
 - **Characters (Samu and Bongz):** from [AI Generated Character Pack 2](https://rotinda-dag.itch.io/ai-generated-character-pack-2) by rotinda dag
 - **Animations:** from [Mixamo](https://www.mixamo.com)
+- **Music:** Amahlalakhona (Thando vox) by Epic Lova, `public/music/amahlalakhona.mp3`
 
 ## License
 

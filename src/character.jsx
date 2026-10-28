@@ -40,6 +40,7 @@ const CLIPS = {
 };
 const IDLES = ['idleCalm', 'idleHappy'];
 const FIDGETS = ['talk', 'hipHop', 'booty', 'salsa', 'circle'];
+const EMOTES = [...FIDGETS, ...IDLES]; // C steps through these while standing still
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
 // Braced Hang To Crouch, measured from the clip, in body heights. It starts with the hands at
@@ -62,7 +63,8 @@ function removeTravel(clip, offset = [0, 0, 0]) {
 const rootStart = (clip) => [...clip.tracks.find((t) => t.name === ROOT_TRACK).values.slice(0, 3)];
 
 // Plays whichever clip `pose.current` names, cross-fading between them. 'idle' means "standing
-// still": it cycles randomly through IDLES, with a FIDGET once it's been still for BORED_AFTER.
+// still": it cycles randomly through IDLES, with a FIDGET once it's been still for BORED_AFTER,
+// or plays the next of EMOTES each time C is pressed.
 export function Character({ who, pose, pace, height }) {
   const look = CHARACTERS[who];
   const names = Object.keys(CLIPS);
@@ -102,6 +104,18 @@ export function Character({ who, pose, pace, height }) {
   useEffect(() => () => mixer.stopAllAction(), [mixer]);
 
   const playing = useRef({ requested: null, name: null, still: 0 });
+  const asked = useRef(null); // emote picked with C, played on the next frame
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.code !== 'KeyC' || e.repeat || e.target.closest?.('input, textarea, select')) return;
+      if (pose.current !== 'idle') return;
+      asked.current = EMOTES[(EMOTES.indexOf(playing.current.name) + 1) % EMOTES.length];
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [pose]);
+
   useFrame((_, delta) => {
     const p = playing.current;
     p.still += delta;
@@ -114,6 +128,13 @@ export function Character({ who, pose, pace, height }) {
     if (next === 'idle') {
       next = p.still > BORED_AFTER ? pick(FIDGETS) : pick(IDLES);
       if (FIDGETS.includes(next)) p.still = 0;
+    }
+    if (asked.current) {
+      if (pose.current === 'idle') {
+        next = asked.current;
+        p.still = 0;
+      }
+      asked.current = null;
     }
 
     if (next === p.name) {

@@ -6,7 +6,7 @@ Paste any public [are.na](https://www.are.na) channel and it becomes a world of 
 
 ![Samu standing in a room of film stills](screenshots/play.png)
 
-> Looking for the original 3D image layout, the version on the Studio side of [amanziconnexions.com](https://amanziconnexions.com)? That lives on the [`master`](https://github.com/Passopla/Play-ARE.NA/tree/master) branch. This `game` branch is where the game is being built.
+> Looking for the original 3D image layout, the version on the Studio side of [amanziconnexions.com](https://amanziconnexions.com)? That lives on the [`master`](https://github.com/Passopla/Play-ARE.NA/tree/master) branch. This `game` branch is the game.
 
 Inspired by this GIF: ![Inspiration GIF](https://d2w9rnfcy7mm78.cloudfront.net/25331503/original_8fd108a2dc340a19c9238bf5dac151f2.gif?1703160360)
 

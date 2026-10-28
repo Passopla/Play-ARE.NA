@@ -7,8 +7,8 @@ export function arenaSlug(input) {
 export const PAGE_SIZE = 25;
 
 // Goes through /arena (our own server), which adds the API token; see vite.config.js and api/arena.js.
-// The GitHub Pages build has no server: deploy.sh sets VITE_ARENA_API to call Are.na directly
-// (it allows CORS; public channels need no token, at a lower rate limit).
+// The GitHub Pages build has no server: deploy.sh sets VITE_ARENA_API to the Amanzi site's
+// /api/arena, which adds the token there (ARENA_TOKEN in that Vercel project).
 async function arena(path) {
   const res = await fetch(`${import.meta.env.VITE_ARENA_API ?? '/arena'}/v2/channels/${path}`);
   if (!res.ok) {

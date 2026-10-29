@@ -1,0 +1,40 @@
+# Every push to game builds it and publishes it to GitHub Pages, which the Amanzi site embeds.
+# Vercel keeps serving master.
+name: Pages
+on:
+  push:
+    branches: [game]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      # No server on Pages: Are.na goes through the Amanzi site's keyed proxy instead
+      - run: npx vite build --base=/Play-ARE.NA/
+        env:
+          VITE_ARENA_API: https://www.amanziconnexions.com/api/arena
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

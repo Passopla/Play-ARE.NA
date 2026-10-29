@@ -1,6 +1,6 @@
 import { useFrame, useLoader } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { AnimationMixer, LoopOnce, MeshLambertMaterial, SRGBColorSpace, TextureLoader } from 'three';
+import { AnimationMixer, LoopOnce, LoopRepeat, MeshLambertMaterial, SRGBColorSpace, TextureLoader } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 // Playable characters, first is the default. All share one rig, so every clip below fits each.
@@ -64,7 +64,7 @@ const rootStart = (clip) => [...clip.tracks.find((t) => t.name === ROOT_TRACK).v
 
 // Plays whichever clip `pose.current` names, cross-fading between them. 'idle' means "standing
 // still": it cycles randomly through IDLES, with a FIDGET once it's been still for BORED_AFTER,
-// or plays the next of EMOTES each time C is pressed.
+// or loops the next of EMOTES each time C is pressed.
 export function Character({ who, pose, pace, height }) {
   const look = CHARACTERS[who];
   const names = Object.keys(CLIPS);
@@ -129,10 +129,12 @@ export function Character({ who, pose, pace, height }) {
       next = p.still > BORED_AFTER ? pick(FIDGETS) : pick(IDLES);
       if (FIDGETS.includes(next)) p.still = 0;
     }
+    let emote = false;
     if (asked.current) {
       if (pose.current === 'idle') {
         next = asked.current;
         p.still = 0;
+        emote = true;
       }
       asked.current = null;
     }
@@ -141,7 +143,10 @@ export function Character({ who, pose, pace, height }) {
       if (finished) actions[next].reset(); // picked the same idle again: replay it
     } else {
       const from = actions[p.name];
-      const to = actions[next].reset().play();
+      const to = actions[next].reset();
+      // Picked with C: loop until the player moves or presses C again. Picked by itself: once
+      if (EMOTES.includes(next)) to.setLoop(emote ? LoopRepeat : LoopOnce, Infinity);
+      to.play();
       // The mantle ends with the root up on the ledge, right where the body is teleported to,
       // so cut instantly; blending would sink it back down for a moment
       if (from && p.name === 'mantle') from.stop();

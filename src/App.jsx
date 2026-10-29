@@ -717,7 +717,7 @@ function App() {
                 <dt><kbd>Space</kbd></dt><dd>Jump, again in mid-air to double jump</dd>
                 <dt><kbd>Mouse</kbd></dt><dd>Move camera: click to capture, <kbd>Esc</kbd> frees it</dd>
                 <dt><kbd>Wall</kbd></dt><dd>Run into a wall to climb, <kbd>Space</kbd> to leap off</dd>
-                <dt><kbd>C</kbd></dt><dd>Dance and emotes, while standing still</dd>
+                <dt><kbd>C</kbd></dt><dd>Dance and emotes while standing still, loops until you move</dd>
                 <dt><kbd>Scroll</kbd></dt><dd>Zoom</dd>
               </dl>
               <dl>
@@ -726,7 +726,7 @@ function App() {
             </div>
             <div className="menu-actions">
               <button type="button" onClick={(e) => { e.currentTarget.blur(); setMenu(false); setStarted(true); }}>
-                Explore
+                Fly
               </button>
               <button
                 type="button"

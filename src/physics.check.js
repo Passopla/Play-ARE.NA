@@ -37,4 +37,19 @@ assert.ok(touched(contacts, 'x', -1));
 // ...and says which box it was, so the climber knows where the wall's top edge is
 assert.equal(contacts.find(([a]) => a === 'x')[2], wall);
 
+// Zero-thickness planes, the real player's size: solid from either side, even at speed
+const player = { x: 0.08, y: 0.2, z: 0.08 };
+const plane = box([0, 0, -2], [0, 3, 2]); // a wall at x = 0
+for (const side of [-1, 1]) {
+  pos = { x: side, y: 1, z: 0 };
+  vel = { x: -side * 30, y: 0, z: 0 };
+  moveAndCollide(pos, vel, player, [plane], 1 / 30);
+  assert.equal(pos.x, side * 0.08); // stopped on the side it came from
+}
+const thinFloor = box([-2, 0, -2], [2, 0, 2]);
+pos = { x: 0, y: 2, z: 0 };
+vel = { x: 0, y: -40, z: 0 };
+moveAndCollide(pos, vel, player, [thinFloor], 1 / 20);
+assert.equal(pos.y, 0.2); // feet exactly on the image
+
 console.log('physics checks passed');

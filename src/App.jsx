@@ -2,23 +2,14 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { LinearMipmapLinearFilter, Matrix4, NearestFilter, MOUSE, Quaternion, Ray, SRGBColorSpace, TextureLoader, Vector3 } from 'three';
 import { Suspense, useCallback, useState, useEffect, useRef, useMemo } from 'react';
-import { fillNearest, roomLayout, roomsNear, ROOM_SPACING } from './layout';
+import { fillNearest, roomLayout, shrinkTo, roomsNear, ROOM_SPACING } from './layout';
 import { arenaSlug, fetchArenaPage, fetchChannelLength, PAGE_SIZE } from './arena';
 import { colliders, colliderFromObject, moveAndCollide, nearestFloorTop } from './physics';
 import { Character, CHARACTERS, MANTLE } from './character';
 import './App.css';
 
-const DEFAULT_IMAGES = [
-  'https://d2w9rnfcy7mm78.cloudfront.net/3894388/original_1e9e4ee58447dd9add36c08b6e4b2dd2.gif?1553011688',
-  'https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIyNTMzMTU2MC9vcmlnaW5hbF8yOWEyNGJlNGYzMTBiM2JmZTEyNjE3MGU1OGUzNmRlZi5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=',
-  'https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiI3NzE0NDE5L29yaWdpbmFsX2JiMTNhNmEwOThlMWI0ZGQyMDIwMDYxOC00LTFkMnpyaDQuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjozMDAsImhlaWdodCI6MzAwLCJmaXQiOiJpbnNpZGUiLCJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWV9LCJ3ZWJwIjp7InF1YWxpdHkiOjc1fSwiZmxhdHRlbiI6eyJiYWNrZ3JvdW5kIjp7InIiOjIwMywiZyI6MjAzLCJiIjoyMDN9fSwianBlZyI6eyJxdWFsaXR5Ijo3NX0sInJvdGF0ZSI6bnVsbH19',
-  'https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNTAzNTIxOS9vcmlnaW5hbF9jYzI5ZTAxMDE1MWVmNzZkMDI2N2JkODRlNGNiZDZiOC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=',
-  'https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNTAyMzY5MC9vcmlnaW5hbF9hZTBjNmE1NjU1MWYzMWI0YTI2MjcwMzJiY2ViYzBiOC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=',
-  'https://d2w9rnfcy7mm78.cloudfront.net/34702321/original_065555d22addd36aa9eecbd9d621c5a7.gif?1740113172',
-  'https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNDcwMjI5Mi9vcmlnaW5hbF8zNjU0ZjA5NzZhNTFhZjhiODNhMzQ5NTgwMjJlMjdkMi5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=',
-  'https://images.are.na/eyJidWNrZXQiOiJhcmVuYV9pbWFnZXMiLCJrZXkiOiIzNDcwMjE3Ni9vcmlnaW5hbF9mOGJhYWYwYTZlMDI3NWI5YjFiNzM0MTJjYWMxYTcwOS5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjMwMCwiaGVpZ2h0IjozMDAsImZpdCI6Imluc2lkZSIsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX0sIndlYnAiOnsicXVhbGl0eSI6NzV9LCJmbGF0dGVuIjp7ImJhY2tncm91bmQiOnsiciI6MjAzLCJnIjoyMDMsImIiOjIwM319LCJqcGVnIjp7InF1YWxpdHkiOjc1fSwicm90YXRlIjpudWxsfX0=',
-  'https://d2w9rnfcy7mm78.cloudfront.net/34702184/original_dc6fcb41eecc6bf457e7e388f47aac3f.gif?1740112610'
-].map((url) => ({ thumb: url, display: url })); // single size, already small
+// Opens with this channel unless the link names another (?channel=<slug>)
+const DEFAULT_CHANNEL = 'soldat-sans-frontieres/cinematography-y8cp9xwq41o';
 
 // Keep the image from being too big, but keep the aspect ratio
 const MAX_SIZE = 3;
@@ -278,6 +269,9 @@ const POLAR_MIN = 0.35; // highest the camera can go
 const POLAR_MAX = 2.4; // lowest (looking up)
 const LOOK_SENSITIVITY = 0.0025; // radians per pixel of mouse movement
 const CAMERA_CLEARANCE = 0.05; // stays this far in front of an image it would otherwise go behind
+const CAMERA_FALL_LIFT = 0.45; // while falling, aim this far higher so the character drops to the bottom of the frame
+const CAMERA_FALL_SPEED = 4; // ...once falling faster than this (a jump's peak doesn't count)
+const CAMERA_FALL_EASE = 3; // how quickly the framing shifts in and out (per second)
 const CAMERA_FOLLOW = 20; // how quickly the camera catches up (per second); smooths the mantle's teleport
 const GAME_KEYS = new Set([...NAV_KEYS, 'Space']);
 
@@ -383,6 +377,17 @@ function Player({ who }) {
     b.spaceWasDown = spaceDown;
     const jumpQueued = b.sinceJumpPress < JUMP_BUFFER;
     b.stateTime += dt;
+
+    // Back at the spawn after a fall: hold there until its floor has streamed back in. The room
+    // unloads while you fall, and its images only turn solid once their textures arrive
+    if (b.waitForFloor) {
+      const floor = nearestFloorTop(b.spawn);
+      if (floor && Math.hypot(floor.x - b.spawn.x, floor.z - b.spawn.z) < 0.01) b.waitForFloor = false;
+      else {
+        b.pos.copy(b.spawn);
+        b.vel.set(0, 0, 0);
+      }
+    }
 
     if (b.state === 'mantle') {
       // Frozen while the animation pulls the body up; then stand on top of the ledge
@@ -498,6 +503,7 @@ function Player({ who }) {
       b.pos.copy(b.spawn);
       b.vel.set(0, 0, 0);
       b.airPose = null;
+      b.waitForFloor = true;
       enter(b, 'air');
     }
 
@@ -512,7 +518,10 @@ function Player({ who }) {
     const l = look.current;
     target.copy(b.pos).y += CAMERA_HEIGHT;
     follow.lerp(target, 1 - Math.exp(-CAMERA_FOLLOW * dt));
+    const falling = b.state === 'air' && b.vel.y < -CAMERA_FALL_SPEED;
+    l.lift = (l.lift ?? 0) + ((falling ? CAMERA_FALL_LIFT : 0) - (l.lift ?? 0)) * (1 - Math.exp(-CAMERA_FALL_EASE * dt));
     pivot.copy(follow).addScaledVector(right.set(Math.cos(l.yaw), 0, -Math.sin(l.yaw)), CAMERA_SHOULDER);
+    pivot.y += l.lift;
     toCamera.setFromSphericalCoords(1, l.polar, l.yaw);
     ray.set(pivot, toCamera);
     let distance = l.distance;
@@ -561,9 +570,9 @@ function Scene() {
 const MUSIC = `${import.meta.env.BASE_URL}music/amahlalakhona.mp3`;
 
 function App() {
-  const [images, setImages] = useState(DEFAULT_IMAGES);
+  const [images, setImages] = useState([]);
   const [channel, setChannel] = useState(
-    () => new URLSearchParams(window.location.search).get('channel') ?? ''
+    () => new URLSearchParams(window.location.search).get('channel') ?? DEFAULT_CHANNEL
   );
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(null); // { slug, count } while a channel is fetching
@@ -625,7 +634,7 @@ function App() {
         const j = Math.floor(Math.random() * (i + 1));
         [pages[i], pages[j]] = [pages[j], pages[i]];
       }
-      source.current = { slug, pages, busy: false };
+      source.current = { slug, pages, busy: false, size: total }; // size: slots once non-images are dropped
       setLoading({ slug, total });
       setImages(Array(total).fill(null)); // the whole layout exists now; rooms fill as you approach
       // Shareable link: ?channel=<slug>
@@ -642,12 +651,15 @@ function App() {
     src.busy = true;
     const page = src.pages.pop();
     try {
-      const batch = await fetchArenaPage(src.slug, page);
+      const { blocks, images: batch } = await fetchArenaPage(src.slug, page);
       if (source.current !== src) return; // another channel was loaded meanwhile
+      src.size -= blocks - batch.length;
+      const { size } = src;
+      const settle = !src.pages.length;
       // Always a new array, even for a page with no images, so Rooms asks again if still empty
-      setImages((current) => fillNearest(current, roomLayout(current.length), center, batch));
+      setImages((current) => shrinkTo(fillNearest(current, roomLayout(current.length), center, batch), size, settle));
       setLoading(null);
-      setStatus(''); // clears an earlier rate-limit message once a retry works
+      setStatus(settle && !size ? 'That channel has no images' : ''); // also clears an earlier rate-limit message
       src.busy = false;
     } catch (e) {
       src.pages.push(page);

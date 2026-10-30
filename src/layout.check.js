@@ -1,6 +1,6 @@
 // Run with: npm run check
 import assert from 'node:assert/strict';
-import { roomLayout, roomWalls, spiralCells, roomsNear, fillNearest, FLOOR_SLOTS, ROOM_SPACING } from './layout.js';
+import { roomLayout, roomWalls, spiralCells, roomsNear, fillNearest, shrinkTo, FLOOR_SLOTS, ROOM_SPACING } from './layout.js';
 import { arenaSlug } from './arena.js';
 
 // Every image is placed exactly once, in order
@@ -49,6 +49,13 @@ assert.equal(sparse.filter(Boolean).length, 0); // input untouched
 // Already-filled slots are skipped
 const again = fillNearest(filled, rooms, near(far), ['x']);
 assert.ok(far.items.every(({ index }) => again[index] === filled[index]));
+
+// Slots for non-image blocks: empty ones come off the end, nothing moves
+assert.deepEqual(shrinkTo(['a', null, 'b', null, null], 3, false), ['a', null, 'b']);
+// Filled end slots wait while pages are still coming
+assert.deepEqual(shrinkTo(['a', null, 'b'], 2, false), ['a', null, 'b']);
+// Once every page is in, the last image fills the hole
+assert.deepEqual(shrinkTo(['a', null, 'b'], 2, true), ['a', 'b']);
 
 assert.equal(arenaSlug('https://www.are.na/someone/my-channel?page=2'), 'my-channel');
 assert.equal(arenaSlug('https://www.are.na/someone/my-channel/'), 'my-channel');

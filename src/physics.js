@@ -1,20 +1,24 @@
 import { Box3 } from 'three';
 
-// Images are flat; colliders get this much depth on their flat axis so fast falls can't skip through
-export const COLLIDER_THICKNESS = 0.2;
-// Longest distance moved per substep; must stay under half the collider thickness
+// Images are flat and so are their colliders (floors exactly, walls nearly): solid from both sides.
+// A body is pushed back out the side it came from, which works as long as no substep moves it
+// further than its own thinnest width (2 x PLAYER_RADIUS = 0.16), so it can't skip a plane
 const MAX_STEP = 0.08;
 
 // Every mounted image registers its world-space box here (rooms stream in and out)
 export const colliders = new Set();
 
+// Walls stand this far out on both faces, so a climber's hands and feet (which reach past the
+// body's box) stop at the image instead of poking through. 0.1 left a visible gap, 0 clipped
+export const WALL_PADDING = 0.01;
+
 export function colliderFromObject(object) {
   object.updateWorldMatrix(true, true);
   const box = new Box3().setFromObject(object);
-  for (const a of ['x', 'y', 'z']) {
+  for (const a of ['x', 'z']) {
     if (box.max[a] - box.min[a] < 1e-3) {
-      box.min[a] -= COLLIDER_THICKNESS / 2;
-      box.max[a] += COLLIDER_THICKNESS / 2;
+      box.min[a] -= WALL_PADDING;
+      box.max[a] += WALL_PADDING;
     }
   }
   return box;
@@ -63,7 +67,7 @@ export function nearestFloorTop(point) {
   let best = null;
   let bestDistance = Infinity;
   for (const b of colliders) {
-    if (b.max.y - b.min.y > COLLIDER_THICKNESS + 1e-6) continue; // walls
+    if (b.max.y - b.min.y > 1e-3) continue; // walls
     const x = (b.min.x + b.max.x) / 2;
     const z = (b.min.z + b.max.z) / 2;
     const d = (x - point.x) ** 2 + (z - point.z) ** 2;

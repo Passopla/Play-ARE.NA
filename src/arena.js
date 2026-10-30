@@ -27,10 +27,12 @@ export async function fetchChannelLength(slug) {
   return length;
 }
 
-// One page of PAGE_SIZE blocks, keeping the images: thumb (400px) for distance, display (1200px) up close
+// One page of PAGE_SIZE blocks: how many blocks it held, and its images (text, links and other
+// blocks are dropped): thumb (400px) for distance, display (1200px) up close
 export async function fetchArenaPage(slug, page) {
   const { contents } = await arena(`${encodeURIComponent(slug)}/contents?per=${PAGE_SIZE}&page=${page}`);
-  return contents
+  const images = contents
     .filter((b) => b.image)
     .map((b) => ({ thumb: b.image.thumb.url, display: b.image.display.url }));
+  return { blocks: contents.length, images };
 }

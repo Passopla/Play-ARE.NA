@@ -92,3 +92,16 @@ export function fillNearest(images, rooms, [x, z], batch) {
   }
   return next;
 }
+
+// The layout starts with a slot per block, but only images get one in the end. Shrinks images to
+// `size` by dropping empty slots off the end, where nothing moves. Once every page is in
+// (`settle`), each hole still left takes the last image instead, so no room stays half empty.
+export function shrinkTo(images, size, settle) {
+  const next = images.slice();
+  while (next.length > size) {
+    if (!next[next.length - 1]) next.pop();
+    else if (settle && next.includes(null)) next[next.indexOf(null)] = next.pop();
+    else break;
+  }
+  return next;
+}
